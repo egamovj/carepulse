@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -7,15 +8,17 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import CustomFormField from "../CustomFormField";
+import SubmitButton from "../SubmitButton";
+import { UserFormValidation } from "@/lib/validation";
 
 export enum FormFieldType {
   INPUT = "input",
-  TEXTAREA = 'textarea',
-  PHONE_INPUT = 'phoneInput',
-  CHECKBOX = 'checkbox',
-  DATE_PICKER = 'datePicker',
-  SELECT = 'select',
-  SKELETON = 'skeleton',
+  TEXTAREA = "textarea",
+  PHONE_INPUT = "phoneInput",
+  CHECKBOX = "checkbox",
+  DATE_PICKER = "datePicker",
+  SELECT = "select",
+  SKELETON = "skeleton",
 }
 
 const formSchema = z.object({
@@ -25,14 +28,18 @@ const formSchema = z.object({
 });
 
 const PatientForm = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof UserFormValidation>>({
+    resolver: zodResolver(UserFormValidation),
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
+      phone: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof UserFormValidation>) {
     console.log(values);
   }
   return (
@@ -53,7 +60,25 @@ const PatientForm = () => {
           iconAlt="user"
         />
 
-        <Button type="submit">Submit</Button>
+        <CustomFormField
+          fieldType={FormFieldType.INPUT}
+          control={form.control}
+          name="email"
+          label="Email"
+          placeholder="example@gmail.com"
+          iconSrc="/assets/icons/email.svg"
+          iconAlt="email"
+        />
+
+        <CustomFormField
+          fieldType={FormFieldType.PHONE_INPUT}
+          control={form.control}
+          name="phone"
+          label="Phone Number"
+          placeholder="(88) 8581319"
+        />
+
+        <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
       </form>
     </Form>
   );
